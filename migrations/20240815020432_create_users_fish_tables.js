@@ -8,7 +8,6 @@ export function up(knex) {
       table.increments("id").primary();
       table.string("username").notNullable();
       table.string("password").notNullable();
-      table.timestamp("created_at").defaultTo(knex.fn.now());
     })
     .createTable("fish", (table) => {
       table.increments("id").primary();

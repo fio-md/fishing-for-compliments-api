@@ -7,32 +7,52 @@ export async function seed(knex) {
   await knex("fish").del();
   await knex("fish").insert([
     {
-      id: 10,
       type: "fish_01",
-      compliment: "You're like a ray of sunshine on a cloudy day.",
+      compliment: "You're a joy to be around!",
       is_favorite: false,
       user_id: 1,
     },
     {
-      id: 11,
       type: "fish_01",
-      compliment: "You're as inspiring as a motivational speaker.",
+      compliment: "You always have a great attitude.",
       is_favorite: true,
       user_id: 1,
     },
     {
-      id: 12,
       type: "fish_03",
-      compliment: "You're as stylish as a vintage car.",
+      compliment: "You're a bright young thing, you know?",
       is_favorite: true,
       user_id: 2,
     },
     {
-      id: 13,
       type: "fish_02",
-      compliment: "Your aura is as vibrant as a freshly painted fire hydrant.",
+      compliment: "I can tell you have a great work ethic.",
       is_favorite: false,
       user_id: 2,
+    },
+    {
+      type: "fish_03",
+      compliment: "You have a heart of gold.",
+      is_favorite: false,
+      user_id: 2,
+    },
+    {
+      type: "fish_01",
+      compliment: "You're a joy to be around!",
+      is_favorite: false,
+      user_id: 2,
+    },
+    {
+      type: "fish_02",
+      compliment: "You're a natural-born leader.",
+      is_favorite: false,
+      user_id: 3,
+    },
+    {
+      type: "fish_01",
+      compliment: "You have a wonderful sense of humor",
+      is_favorite: true,
+      user_id: 3,
     },
   ]);
 }

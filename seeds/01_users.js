@@ -7,13 +7,15 @@ export async function seed(knex) {
   await knex("users").del();
   await knex("users").insert([
     {
-      id: 1,
-      username: "user1",
+      username: "user",
       password: "1234",
     },
     {
-      id: 2,
-      username: "user2",
+      username: "FlyFisher",
+      password: "1234",
+    },
+    {
+      username: "TunaCatcher",
       password: "1234",
     },
   ]);
