@@ -2,7 +2,6 @@ import initKnex from "knex";
 import configuration from "../knexfile.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { useParams } from "react-router-dom";
 
 const knex = initKnex(configuration);
 const SECRET_KEY = "f91e4494-04b3-4d49-8c27-57faed9e5785";
@@ -70,6 +69,31 @@ const getUserData = async (req, res) => {
   }
 };
 
+const updateFavorite = async (req, res) => {
+  try {
+    const updateCurrentFavorite = await knex("fish")
+      .where({ user_id: req.params.id, is_favorite: true })
+      .update({ is_favorite: false });
+    const updateNewFavorite = await knex("fish")
+      .where({ user_id: req.body.id, is_favorite: false })
+      .update({ is_favorite: true });
+    res.status(400).json({ message: "Updated favorite fish." });
+  } catch (e) {
+    res.status(500).json({ message: "Unable to update favorite fish." });
+  }
+};
+const addToInventory = async (req, res) => {
+  const userID = req.params.id;
+  try {
+    const result = await knex("fish").insert({ user_id: userID, ...req.body });
+    const addedFish = await knex("fish").where({ id: result[0] }).first();
+    res.status(201).json(addedFish);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Unable to add fish to user's inventory." });
+  }
+};
+
 const getRanking = async (_req, res) => {
   try {
     const users = await knex("fish")
@@ -86,4 +110,4 @@ const getRanking = async (_req, res) => {
   }
 };
 
-export { registerUser, loginUser, getRanking, getUserData };
+export { registerUser, loginUser, getRanking, getUserData, addToInventory, updateFavorite };
