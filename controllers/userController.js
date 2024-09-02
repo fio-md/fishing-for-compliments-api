@@ -26,27 +26,14 @@ const getUserData = async (req, res) => {
         res.status(500).json({ message: "Unable to get user data." });
       }
     } else {
-      res.status(403).json({ error: "Not Authorized." });
+      res.status(403).json({ error: "Invalid token. Unauthorized." });
     }
   } else {
     res.status(403).json({ error: "No token. Unauthorized." });
   }
 };
 
-const updateFavorite = async (req, res) => {
-  try {
-    const updateCurrentFavorite = await knex("fish")
-      .where({ user_id: req.params.id, is_favorite: true })
-      .update({ is_favorite: false });
-    const updateNewFavorite = await knex("fish")
-      .where({ user_id: req.body.id, is_favorite: false })
-      .update({ is_favorite: true });
-    res.status(400).json({ message: "Updated favorite fish." });
-  } catch (e) {
-    res.status(500).json({ message: "Unable to update favorite fish." });
-  }
-};
-const addToInventory = async (req, res) => {
+const addFish = async (req, res) => {
   const userID = req.params.id;
   try {
     const result = await knex("fish").insert({ user_id: userID, ...req.body });
@@ -58,20 +45,20 @@ const addToInventory = async (req, res) => {
   }
 };
 
-const getRanking = async (_req, res) => {
+const deleteFish = async (req, res) => {
+  const { fishID } = req.body;
   try {
-    const users = await knex("fish")
-      .join("users", "users.id", "fish.user_id")
-      .count("fish.id as fish_caught")
-      .select("username", "users.id")
-      .groupBy("username", "users.id")
-      .orderBy("fish_caught", "desc")
-      .limit(10);
-    res.status(200).json(users);
+    const fishToDelete = await knex("fish").where({ id: fishID }).first();
+    if (!fishToDelete) {
+      res.status(400).json({ message: `Unable to find fish with ID ${fishID}` });
+    } else {
+      const result = await knex("fish").where({ id: fishID }).delete();
+      res.status(200).json({ message: "Fish deleted" });
+    }
   } catch (e) {
     console.error(e);
-    res.status(500).json({ message: "Unable to get ranking." });
+    res.status(500).send("Unable to delete fish");
   }
 };
 
-export { getRanking, getUserData, addToInventory, updateFavorite };
+export { getUserData, addFish, deleteFish };
