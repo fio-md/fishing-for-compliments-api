@@ -11,12 +11,24 @@ export function up(knex) {
     })
     .createTable("fish", (table) => {
       table.increments("id").primary();
-      table.integer("user_id").unsigned().notNullable();
       table.string("type").notNullable();
+      table.string("image");
+    })
+    .createTable("compliments", (table) => {
+      table.increments("id").primary();
       table.string("compliment").notNullable();
+    })
+    .createTable("user_fish", (table) => {
+      table.increments("id").primary();
+      table.integer("user_id").unsigned().references("id").inTable("users");
+      table.integer("fish_id").unsigned().references("id").inTable("fish");
+      table
+        .integer("compliment_id")
+        .unsigned()
+        .references("id")
+        .inTable("compliments");
       table.boolean("is_favorite").notNullable().defaultTo(false);
       table.timestamp("created_at").defaultTo(knex.fn.now());
-      table.foreign("user_id").references("id").inTable("users");
     });
 }
 
@@ -25,5 +37,9 @@ export function up(knex) {
  * @returns { Promise<void> }
  */
 export function down(knex) {
-  return knex.schema.dropTable("users").dropTable("fish");
+  return knex.schema
+    .dropTable("users")
+    .dropTable("fish")
+    .dropTable("compliments")
+    .dropTable("user_fish");
 }
