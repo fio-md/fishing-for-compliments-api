@@ -1,6 +1,7 @@
+import { Knex } from "knex";
 import "dotenv/config";
 
-export default {
+const configs: Knex.Config = {
   client: "mysql2",
   connection: {
     host: process.env.DB_HOST,
@@ -9,4 +10,9 @@ export default {
     password: process.env.DB_PASSWORD,
     charset: "utf8",
   },
+  migrations: {
+    directory: "./migrations",
+  },
 };
+
+export default configs;

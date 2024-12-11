@@ -1,32 +1,37 @@
-import initKnex from "knex";
-import configuration from "../../knexfile.js";
+import db from "../db/database.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import "dotenv/config";
+import { NextFunction, Request, Response } from "express";
+import { UserFormDto } from "../dtos/UserForm.dto.js";
 
-const knex = initKnex(configuration);
-
-export const registerUser = async (req, res) => {
+export const registerUser = async (
+  req: Request<{}, {}, UserFormDto>,
+  res: Response
+) => {
   const { username, password } = req.body;
-
   // check if username is available
-  const user = await knex("users").where({ username: username });
+  const user = await db("users").where({ username: username });
   if (user.length) {
     return res.status(400).send("Username already exists.");
   } else {
     const salt = await bcrypt.genSalt();
     let hashedPassword = await bcrypt.hash(password, salt);
-    const addUser = await knex("users").insert({
+    const addUser = await db("users").insert({
       username: username,
       password: hashedPassword,
     });
     // find new user in database
-    const newUser = await knex("users").where({ id: addUser[0] }).first();
+    const newUser = await db("users").where({ id: addUser[0] }).first();
     res.status(201).send(`User ${newUser.username} has been added.`);
   }
 };
 
-export function authenticateToken(req, res, next) {
+export function authenticateToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const token = req.headers.token;
   if (!token) {
     return res.status(401).send("Unauthorized");
@@ -39,10 +44,10 @@ export function authenticateToken(req, res, next) {
   });
 }
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  const user = await knex("users").where({ username }).first();
+  const user = await db("users").where({ username }).first();
   if (!user) {
     return res.status(400).send("User not found");
   }
@@ -60,10 +65,10 @@ export const loginUser = async (req, res) => {
   }
 };
 
-export const getUserData = async (req, res) => {
+export const getUserData = async (req: Request, res: Response) => {
   try {
     const username = req.user.username;
-    const inventory = await knex("user_fish")
+    const inventory = await db("user_fish")
       .select("id", "image", "compliment")
       .where({ username })
       .join("users", "user_fish.user_id", "users.id")
@@ -76,18 +81,18 @@ export const getUserData = async (req, res) => {
   }
 };
 
-export const addToInventory = async (req, res) => {
+export const addToInventory = async (req: Request, res: Response) => {
   const username = req.user.username;
-  const userId = await knex("users")
+  const userId = await db("users")
     .select("id")
     .where({ username: username })
     .first();
 
-  const result = await knex("user_fish").insert({
+  const result = await db("user_fish").insert({
     user_id: userId.id,
     ...req.body,
   });
-  const addedFish = await knex("user_fish").where({ id: result[0] }).first();
+  const addedFish = await db("user_fish").where({ id: result[0] }).first();
 
   if (addedFish) {
     res.status(201).json(addedFish);
@@ -96,10 +101,10 @@ export const addToInventory = async (req, res) => {
   }
 };
 
-export const getFishInfo = async (req, res) => {
+export const getFishInfo = async (req: Request, res: Response) => {
   const fishId = Number(req.params.id);
   try {
-    const fish = await knex("user_fish")
+    const fish = await db("user_fish")
       .select("user_fish.id", "image", "type", "compliment")
       .where({ "user_fish.id": fishId })
       .join("users", "user_fish.user_id", "users.id")
@@ -112,10 +117,10 @@ export const getFishInfo = async (req, res) => {
   }
 };
 
-export const deleteFish = async (req, res) => {
+export const deleteFish = async (req: Request, res: Response) => {
   const fishId = Number(req.params.id);
   try {
-    const deleteFish = await knex("user_fish").where({ id: fishId }).del();
+    const deleteFish = await db("user_fish").where({ id: fishId }).del();
     res.status(200).send("Successfully removed fish from database.");
   } catch (e) {
     res.status(500).send(`Unable to remove fish with id: ${fishId}}. ${e}`);

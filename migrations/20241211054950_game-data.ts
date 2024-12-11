@@ -1,14 +1,7 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export function up(knex) {
+import type { Knex } from "knex";
+
+export async function up(knex: Knex): Promise<void> {
   return knex.schema
-    .createTable("users", (table) => {
-      table.increments("id").primary();
-      table.string("username").notNullable();
-      table.string("password").notNullable();
-    })
     .createTable("fish", (table) => {
       table.increments("id").primary();
       table.string("type").notNullable();
@@ -32,13 +25,8 @@ export function up(knex) {
     });
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   return knex.schema
-    .dropTable("users")
     .dropTable("fish")
     .dropTable("compliments")
     .dropTable("user_fish");

@@ -1,11 +1,9 @@
-import initKnex from "knex";
-import configuration from "../../knexfile.js";
+import { Request, Response } from "express";
+import db from "../db/database";
 
-const knex = initKnex(configuration);
-
-export const getRanking = async (_req, res) => {
+export const getRanking = async (_req: Request, res: Response) => {
   try {
-    const users = await knex("user_fish")
+    const users = await db("user_fish")
       .join("users", "users.id", "user_fish.user_id")
       .count("user_fish.id as fish_caught")
       .select("username", "users.id")
@@ -19,10 +17,10 @@ export const getRanking = async (_req, res) => {
   }
 };
 
-export const getRandomFish = async (_req, res) => {
+export const getRandomFish = async (_req: Request, res: Response) => {
   try {
-    const allFish = await knex("fish");
-    const allCompliments = await knex("compliments");
+    const allFish = await db("fish");
+    const allCompliments = await db("compliments");
 
     const randomFish = allFish[Math.floor(Math.random() * allFish.length)];
     const randomCompliment =
