@@ -22,8 +22,9 @@ export const getRandomFish = async (_req: Request, res: Response) => {
     const allFish = await db("fish");
     const allCompliments = await db("compliments");
 
-    const randomFish = allFish[Math.floor(Math.random() * allFish.length)];
-    const randomCompliment =
+    const randomFish: string =
+      allFish[Math.floor(Math.random() * allFish.length)];
+    const randomCompliment: string =
       allCompliments[Math.floor(Math.random() * allCompliments.length)];
     res.status(200).json({ randomFish, randomCompliment });
   } catch (e) {
