@@ -8,7 +8,6 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
     res.sendStatus(401); // Unauthorized
     return;
   }
-  console.log(authHeader);
   const token = authHeader.split(" ")[1];
   if (process.env.ACCESS_KEY) {
     const result = jwt.verify(token, process.env.ACCESS_KEY) as jwt.JwtPayload;
