@@ -10,21 +10,21 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    res.status(400).send("Username and password required.");
+    res.status(400).send("Missing username or password.");
     return;
   }
 
   // find username in database
   const foundUser = await db("users").where({ username }).first();
   if (!foundUser) {
-    res.status(400).send("User not found");
+    res.status(401).send("Username doesn't exist.");
     return;
   }
 
   const checkPassword = await bcrypt.compare(password, foundUser.password);
   if (checkPassword) {
     if (!ACCESS_KEY || !REFRESH_KEY) {
-      res.status(400).send("Missing environment variables");
+      res.status(500).send("Missing environment variables");
       return;
     }
 
@@ -50,6 +50,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     });
     res.status(200).json({ accessToken });
   } else {
-    res.status(500).send("Invalid username/password combitnation.");
+    res.status(401).send("Invalid username/password combitnation.");
   }
 };
